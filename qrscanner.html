@@ -4,6 +4,9 @@
     <title>QR Code Generator</title>
     <link rel="stylesheet" href="bootstrap.min.css" />
     <style>
+      body{
+        background-color: lightgrey;
+      }
       .qr-code {
         max-width: 150px;
         margin: 10px;
@@ -11,9 +14,14 @@
     </style>
   </head>
   <body>
+    <div class="card">
+      <div class="text-center card-body">
+        <h1>Qr-Code Generator</h1>
+      </div>
+    </div>
     <div class="container-fluid">
       <div class="text-center">
-        <img src="https://chart.googleapis.com/chart?cht=qr&chl=Hello+World&chs=160x160&chld=L|0" class="qr-code img-thumbnail img-responsive" download/>
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=Hello+World" class="qr-code img-thumbnail img-responsive" download/>
       </div>
       <div class="form-horizontal">
         <div class="form-group">
@@ -62,7 +70,7 @@
           var email = htmlEncode($('#email').val());
           var data = htmlEncode($('#data').val());
           var content = "Name: " + name + ", Mobile No: " + mobile + ", Email: " + email + ", Data: "+ data;
-          var finalURL = 'https://chart.googleapis.com/chart?cht=qr&chl=' + encodeURIComponent(content) + '&chs=160x160&chld=L|0';
+          var finalURL = 'https://api.qrserver.com/v1/create-qr-code/?data=' + encodeURIComponent(content) + '&size=160x160';
           $('.qr-code').attr('src', finalURL);
         });
         
@@ -72,10 +80,15 @@
           var email = htmlEncode($('#email').val());
           var data = htmlEncode($('#data').val());
           var content = "Name: " + name + ", Mobile No: " + mobile + ", Email: " + email + ", Data: "+ data;
-          var finalURL = 'https://chart.googleapis.com/chart?cht=qr&chl=' + encodeURIComponent(content) + '&chs=160x160&chld=L|0';
+          var finalURL = 'https://api.qrserver.com/v1/create-qr-code/?data=' + encodeURIComponent(content) + '&size=160x160';
 
           fetch(finalURL)
-          .then(response => response.blob())
+          .then(response => {
+            if (!response.ok) {
+              throw new Error('Network response was not ok');
+            }
+            return response.blob();
+          })
           .then(blob => {
             var link = document.createElement('a');
             link.href = URL.createObjectURL(blob);
@@ -83,7 +96,8 @@
             link.click();
           })
           .catch(error => {
-            console.log('Error:', error);
+            console.error('Error:', error);
+            alert('Error occurred while downloading QR code. Please try again later.');
           });
         });
       });
